@@ -45,7 +45,8 @@ const steamUser$ = fromEvent(button, 'click')
             Observable.create((observer: any) => {
                 axios.get('https://jsonplaceholder.typicode.com/users')
                     .then((response: Response) => {
-                        //  message.style.display = 'flex';
+                        message.style.display = 'flex';
+                        setTimeout((()=>{message.style.display = 'none'}), 2000);
                         response.data.map((user: User) => {
                             observer.next(user);
                         });
@@ -73,7 +74,8 @@ steamUser$.subscribe(
                     Observable.create((observer: any) => {
                         axios.get(`https://jsonplaceholder.typicode.com/posts?userId=${user.id}`)
                             .then((response: Response) => {
-                                // message.style.display = 'flex';
+                                message.style.display = 'flex';
+                                setTimeout((()=>{message.style.display = 'none'}), 2000);
                                 response.data.map((post: Post) => {
                                     observer.next(post);
                                 });
@@ -110,6 +112,8 @@ steamUser$.subscribe(
                         .then((response: Response) => {
                             wrapperComment.innerHTML = '';
                             response.data.map((comment: Comment) => {
+                                message.style.display = 'flex';
+                                setTimeout((()=>{message.style.display = 'none'}), 2000);
                                 const divComment = wrapperComment.appendChild(document.createElement('div'));
                                 divComment.className = 'comment';
                                 divComment.innerHTML = comment.name;
