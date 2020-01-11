@@ -1,5 +1,5 @@
-import {fromEvent, Observable, of} from 'rxjs'
-import {switchMap, mergeMap, tap, catchError, map} from "rxjs/operators";
+import {fromEvent, Observable} from 'rxjs'
+import {switchMap, tap} from "rxjs/operators";
 import axios from 'axios';
 
 const button = document.getElementById('button');
@@ -41,18 +41,18 @@ const steamUser$ = fromEvent(button, 'click')
             wrapperPost.innerHTML = '';
             wrapperComment.innerHTML = ''
         }),
-        switchMap((value: object) =>
+        switchMap(() =>
             Observable.create((observer: any) => {
                 axios.get('https://jsonplaceholder.typicode.com/users')
                     .then((response: Response) => {
-                        // message.style.display = 'flex';
+                        //  message.style.display = 'flex';
                         response.data.map((user: User) => {
                             observer.next(user);
                         });
                     }).catch((error: string) => {
-                        let html = ` <div class="error">${error}</div>`;
-                        wrapperUser.insertAdjacentHTML("beforeend", html)
-                    });
+                    let html = ` <div class="error">${error}</div>`;
+                    wrapperUser.insertAdjacentHTML("beforeend", html)
+                });
             })
         )
     );
@@ -69,17 +69,18 @@ steamUser$.subscribe(
                     wrapperPost.innerHTML = '';
                     wrapperComment.innerHTML = ''
                 }),
-                switchMap((value: Object) =>
+                switchMap(() =>
                     Observable.create((observer: any) => {
                         axios.get(`https://jsonplaceholder.typicode.com/posts?userId=${user.id}`)
-                            .then((response:Response)=>{
+                            .then((response: Response) => {
+                                // message.style.display = 'flex';
                                 response.data.map((post: Post) => {
                                     observer.next(post);
                                 });
                             }).catch((error: string) => {
-                                let html = ` <div class="error">${error}</div>`;
-                                wrapperUser.insertAdjacentHTML("beforeend", html)
-                            })
+                            let html = ` <div class="error">${error}</div>`;
+                            wrapperUser.insertAdjacentHTML("beforeend", html)
+                        })
                     })
                 )
             );
@@ -89,53 +90,37 @@ steamUser$.subscribe(
                 divPost.className = 'buttonPost';
                 divPost.innerHTML = post.title;
 
-                        const steamComment$ = fromEvent(divPost, 'click');
-                        steamComment$.subscribe(() => {
-                            axios.get(`https://jsonplaceholder.typicode.com/comments?postId=${post.id}`)
-                                .then((response: Response) => {
-                                    wrapperComment.innerHTML = '';
-                                    response.data.map((comment: Comment) => {
-                                        const divComment = wrapperComment.appendChild(document.createElement('div'));
-                                        divComment.className = 'comment';
-                                        divComment.innerHTML = comment.name;
-                                    })
-                                }).catch((error: string) => {
-                                let html = ` <div class="error">${error}</div>`;
-                                wrapperUser.insertAdjacentHTML("beforeend", html)
-                            })
-                        })
+                const spinner = divPost.appendChild(document.createElement('div'));
+                spinner.className = 'spinner-border spinner-border-sm';
+                spinner.setAttribute('role', 'status');
+                const spinnerSpan = spinner.appendChild(document.createElement('span'));
+                spinnerSpan.className = 'sr-only';
+
+                axios.get(`https://jsonplaceholder.typicode.com/comments?postId=${post.id}`)
+                    .then((response: Response) => {
+                        spinner.style.display = 'none';
+                        const elementNumber = divPost.appendChild(document.createElement('div'));
+                        elementNumber.innerHTML = String(response.data.length);
+                        elementNumber.className = 'number';
                     });
+
+                const steamComment$ = fromEvent(divPost, 'click');
+                steamComment$.subscribe(() => {
+                    axios.get(`https://jsonplaceholder.typicode.com/comments?postId=${post.id}`)
+                        .then((response: Response) => {
+                            wrapperComment.innerHTML = '';
+                            response.data.map((comment: Comment) => {
+                                const divComment = wrapperComment.appendChild(document.createElement('div'));
+                                divComment.className = 'comment';
+                                divComment.innerHTML = comment.name;
+                            })
+                        }).catch((error: string) => {
+                        let html = ` <div class="error">${error}</div>`;
+                        wrapperUser.insertAdjacentHTML("beforeend", html)
+                    })
+                })
+            });
     },
     (error: string) => console.log('Error:' + error),
     () => console.log('Completed')
 );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//------------spinner--------------
-// const spinner = divPost.appendChild(document.createElement('div'));
-// spinner.className = 'spinner-border spinner-border-sm';
-// spinner.setAttribute('role', 'status');
-// const spinnerSpan = spinner.appendChild(document.createElement('span'));
-// spinnerSpan.className = 'sr-only'
-
-
-

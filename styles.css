@@ -19,15 +19,20 @@ body{
   margin-left: 10px;
 }
 
-#wrapperUser, #wrapperPost, #wrapperComment {
+#wrapperUser, #wrapperComment {
   width: 250px;
   margin-top: 25px;
   margin-right: 25px;
   margin-left: 10px;
 }
 
-#wrapperPost{
+#wrapperPost {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
   width: 550px;
+  margin-top: 25px;
+  margin-right: 25px;
 }
 
 #wrapperComment{
@@ -40,6 +45,8 @@ body{
 }
 
 .buttonUser, .buttonPost, .comment{
+  display: flex;
+  justify-content: space-between;
   border: 1px solid beige;
   padding: 10px;
 }
@@ -50,4 +57,15 @@ body{
   height: 70px;
 }
 
+.number {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 20px;
+  height: 20px;
+  border: 1px solid cadetblue;
+  border-radius: 50%;
+  background-color: cadetblue;
+  font-size: 15px;
+}
 
