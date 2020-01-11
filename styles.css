@@ -19,7 +19,7 @@ body{
   margin-left: 10px;
 }
 
-#wrapperUser, #wrapperComment {
+#wrapperUser{
   width: 250px;
   margin-top: 25px;
   margin-right: 25px;
@@ -37,6 +37,8 @@ body{
 
 #wrapperComment{
   width: 350px;
+  margin-top: 25px;
+  margin-right: 25px;
 }
 
 .error{
@@ -53,6 +55,8 @@ body{
 
 #message{
   display: none;
+  position: absolute;
+  right: 150px;
   width: 270px;
   height: 70px;
 }
