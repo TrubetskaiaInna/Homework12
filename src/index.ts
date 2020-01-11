@@ -1,5 +1,4 @@
 import {fromEvent, Observable, of} from 'rxjs'
-import {ajax} from "rxjs/ajax";
 import {switchMap, mergeMap, tap, catchError, map} from "rxjs/operators";
 import axios from 'axios';
 
@@ -37,16 +36,20 @@ interface Response {
 
 const steamUser$ = fromEvent(button, 'click')
     .pipe(
-        tap(() => wrapperUser.innerHTML = ''),
-        switchMap((value: object) => Observable.create((observer: any) => {
+        tap(() => {
+            wrapperUser.innerHTML = '';
+            wrapperPost.innerHTML = '';
+            wrapperComment.innerHTML = ''
+        }),
+        switchMap((value: object) =>
+            Observable.create((observer: any) => {
                 axios.get('https://jsonplaceholder.typicode.com/users')
                     .then((response: Response) => {
                         // message.style.display = 'flex';
                         response.data.map((user: User) => {
                             observer.next(user);
                         });
-                    })
-                    .catch((error: string) => {
+                    }).catch((error: string) => {
                         let html = ` <div class="error">${error}</div>`;
                         wrapperUser.insertAdjacentHTML("beforeend", html)
                     });
@@ -60,26 +63,71 @@ steamUser$.subscribe(
         divUser.className = 'buttonUser';
         divUser.innerHTML = user.name;
 
-        const steamPost$ = fromEvent(divUser, 'click');
-        steamPost$.subscribe(() => {
-            axios.get(`https://jsonplaceholder.typicode.com/posts?userId=${user.id}`)
-                .then((response: Response) => {
+        const steamPost$ = fromEvent(divUser, 'click')
+            .pipe(
+                tap(() => {
                     wrapperPost.innerHTML = '';
-                    response.data.map((post: Post) => {
-                        const divPost = wrapperPost.appendChild(document.createElement('div'));
-                        divPost.className = 'buttonPost';
-                        divPost.innerHTML = post.title;
+                    wrapperComment.innerHTML = ''
+                }),
+                switchMap((value: Object) =>
+                    Observable.create((observer: any) => {
+                        axios.get(`https://jsonplaceholder.typicode.com/posts?userId=${user.id}`)
+                            .then((response:Response)=>{
+                                response.data.map((post: Post) => {
+                                    observer.next(post);
+                                });
+                            }).catch((error: string) => {
+                                let html = ` <div class="error">${error}</div>`;
+                                wrapperUser.insertAdjacentHTML("beforeend", html)
+                            })
+                    })
+                )
+            );
+        steamPost$.subscribe(
+            (post: Post) => {
+                const divPost = wrapperPost.appendChild(document.createElement('div'));
+                divPost.className = 'buttonPost';
+                divPost.innerHTML = post.title;
+
+                        const steamComment$ = fromEvent(divPost, 'click');
+                        steamComment$.subscribe(() => {
+                            axios.get(`https://jsonplaceholder.typicode.com/comments?postId=${post.id}`)
+                                .then((response: Response) => {
+                                    wrapperComment.innerHTML = '';
+                                    response.data.map((comment: Comment) => {
+                                        const divComment = wrapperComment.appendChild(document.createElement('div'));
+                                        divComment.className = 'comment';
+                                        divComment.innerHTML = comment.name;
+                                    })
+                                }).catch((error: string) => {
+                                let html = ` <div class="error">${error}</div>`;
+                                wrapperUser.insertAdjacentHTML("beforeend", html)
+                            })
+                        })
                     });
-                })
-                .catch((error: string) => {
-                    let html = ` <div class="error">${error}</div>`;
-                    wrapperUser.insertAdjacentHTML("beforeend", html)
-                });
-        })
     },
     (error: string) => console.log('Error:' + error),
     () => console.log('Completed')
 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 //------------spinner--------------
@@ -90,21 +138,4 @@ steamUser$.subscribe(
 // spinnerSpan.className = 'sr-only'
 
 
-// const steamUser$ = fromEvent(button, 'click')
-//     .pipe(
-//         tap(()  => wrapperUser.innerHTML = ''),
-//        switchMap((value: object) =>  ajax.getJSON('https://jsonplaceholder.typicode.com/users').pipe(
-//             catchError(error => {
-//                 console.log('errorAjax: ', error.message);
-//                 return of (error);
-//             })
-//         )),
-//         mergeMap((items: any) => items)
-//     );
-// steamUser$.subscribe((user: User) => {
-//         const html = ` <div class="user" style="border: 1px solid beige; padding: 10px;">${user.name}</div>`;
-//         wrapperUser.insertAdjacentHTML("beforeend", html)
-//     },
-//     (error:any) => console.log('Error:' + error),
-//     () => console.log('Completed')
-// );
+

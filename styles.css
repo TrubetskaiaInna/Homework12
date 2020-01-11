@@ -30,12 +30,16 @@ body{
   width: 550px;
 }
 
+#wrapperComment{
+  width: 350px;
+}
+
 .error{
   color: red;
   padding: 10px;
 }
 
-.buttonUser, .buttonPost{
+.buttonUser, .buttonPost, .comment{
   border: 1px solid beige;
   padding: 10px;
 }
