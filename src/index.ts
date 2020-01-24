@@ -11,8 +11,25 @@ const wrapperComment = document.getElementById('wrapperComment')
 interface User {
     id: number;
     name: string;
+    username: string;
     email: string;
-    address: object;
+    address: {
+        street: string;
+        suite: string;
+        city: string;
+        zipcode: string;
+        geo: {
+            lat: string;
+            lng: string
+        }
+    };
+    phone: string;
+    website: string;
+    company: {
+        name: string;
+        catchPhrase: string;
+        bs: string
+    }
 }
 
 interface Post {
@@ -30,8 +47,8 @@ interface Comment {
     body: string;
 }
 
-interface Response {
-    data: Array<object>;
+interface Response<T> {
+    data: T;
 }
 
 const steamUser$ = fromEvent(button, 'click')
@@ -44,7 +61,7 @@ const steamUser$ = fromEvent(button, 'click')
     switchMap(() =>
       Observable.create((observer: any) => {
         axios.get('https://jsonplaceholder.typicode.com/users')
-          .then((response: Response) => {
+          .then((response: Response<Array<User>>) => {
             message.style.display = 'flex'
             setTimeout(() => { message.style.display = 'none' }, 2000)
             response.data.map((user: User) => {
@@ -73,7 +90,7 @@ steamUser$.subscribe(
         switchMap(() =>
           Observable.create((observer: any) => {
             axios.get(`https://jsonplaceholder.typicode.com/posts?userId=${user.id}`)
-              .then((response: Response) => {
+              .then((response: Response<Array<Post>>) => {
                 message.style.display = 'flex'
                 setTimeout(() => { message.style.display = 'none' }, 2000)
                 response.data.map((post: Post) => {
@@ -99,7 +116,7 @@ steamUser$.subscribe(
         spinnerSpan.className = 'sr-only'
 
         axios.get(`https://jsonplaceholder.typicode.com/comments?postId=${post.id}`)
-          .then((response: Response) => {
+          .then((response: Response<Array<Comment>>) => {
             spinner.style.display = 'none'
             const elementNumber = divPost.appendChild(document.createElement('div'))
             elementNumber.innerHTML = String(response.data.length)
@@ -109,7 +126,7 @@ steamUser$.subscribe(
         const steamComment$ = fromEvent(divPost, 'click')
         steamComment$.subscribe(() => {
           axios.get(`https://jsonplaceholder.typicode.com/comments?postId=${post.id}`)
-            .then((response: Response) => {
+            .then((response: Response<Array<Comment>>) => {
               wrapperComment.innerHTML = ''
               response.data.map((comment: Comment) => {
                 message.style.display = 'flex'
